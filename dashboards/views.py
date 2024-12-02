@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from blogs.models import Category,Blog
 from django.contrib.auth.decorators import login_required
-from .forms import CategoryForm
+from .forms import CategoryForm,BlogPostForm
 
 # Create your views here.
 
@@ -49,3 +49,25 @@ def delete_category(request,pk):
     category = get_object_or_404(Category,pk=pk)
     category.delete()
     return redirect('categories')
+
+def posts(request):
+    posts = Blog.objects.all()
+    context = {
+        "posts": posts,
+    }
+    return render(request,'dashboard/posts.html',context)
+
+def add_post(request):
+    if request.method == 'POST':
+        form = BlogPostForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('posts')
+        else: 
+            print('form is invalid')
+            print(form.errors)
+    form = BlogPostForm()
+    context = {
+        "form":form,
+    }
+    return render(request,'dashboard/add_post.html',context)
